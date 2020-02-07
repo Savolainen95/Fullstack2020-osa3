@@ -5,7 +5,9 @@ const app = express()
 
 
 app.use(express.json())
+app.use(express.static('build'))
 app.use(cors())
+
 morgan.token('person', function(req) {return JSON.stringify(req.body)})
 
 app.use(morgan(function (tokens, req, res) {
@@ -51,7 +53,7 @@ let persons = [
 
 app.get('/', (req, res) => {
 
-  res.send('<h1>Phonebook</h1>')
+  res.send('<h1>Phonebooasdasdadsak</h1>')
 })
 
 app.get('/info', (request, response) => {
