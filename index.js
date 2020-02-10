@@ -5,13 +5,11 @@ const cors = require('cors')
 const app = express()
 const Person = require('./models/person')
 
-
-
 app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
 
-morgan.token('person', function (req) { return JSON.stringify(req.body) })
+morgan.token('person', (req) => { return JSON.stringify(req.body) })
 
 //luo morgan viestin POST pyynnöille.
 //Esim POST /api/persons 200 79 - 99.837 ms {"name":"Testi Henkilö","number":"555-555-5555"}
@@ -25,7 +23,7 @@ app.use(morgan(function (tokens, req, res) {
     tokens.person(req)
   ].join(' ')
 }, {
-  skip: function (req, res) { return req.method !== 'POST' }
+  skip: (req) => { return req.method !== 'POST' }
 }))
 
 
@@ -61,8 +59,10 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
+      console.log(result)
       response.status(204).end()
-    }).catch(error => next(error))
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -72,7 +72,6 @@ app.put('/api/persons/:id', (request, response, next) => {
     name: body.name,
     number: body.number
   }
-
 
   Person.findByIdAndUpdate(request.params.id, person, { new: true })
     .then(updatePerson => {
@@ -88,16 +87,13 @@ app.post('/api/persons', (request, response, next) => {
 
   const person = new Person({
     name: body.name,
-    number: body.number,
+    number: body.number
   })
 
   person.save()
     .then(savedPerson => {
-      savedPerson.toJSON()
+      response.json(savedPerson.toJSON())
       console.log(savedPerson.toJSON())
-    })
-    .then(savedAndFormatedPerson => {
-      response.json(savedAndFormatedPerson)
     })
     .catch(error => next(error))
 
